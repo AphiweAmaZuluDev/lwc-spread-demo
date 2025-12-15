@@ -1,4 +1,5 @@
 import { LightningElement, track } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class ZodiacSignMessenger extends LightningElement {
 
@@ -110,6 +111,22 @@ export default class ZodiacSignMessenger extends LightningElement {
     }
 
     handleSubmit() {
+        // Validate input fields
+        let isValid = true
+
+        const inputFields  = this.template.querySelectorAll('lightning-input')
+
+        inputFields.forEach(field => {
+            if(field.value === null || field.value === '') {
+                isValid = false
+            }
+        })
+
+        if(!isValid) {
+            this.showToast('Error', 'Please enter a valid name and date of birth', 'error')
+        }
+
+        // Find the Zodiac sign
         this.userName = this.namePlaceholder
         this.userBirthDate = this.dobPlaceholder
         const userDob = new Date(this.userBirthDate)
@@ -135,5 +152,14 @@ export default class ZodiacSignMessenger extends LightningElement {
     clearPlaceholders() {
         this.dobPlaceholder = ''
         this.namePlaceholder = ''
+    }
+
+    showToast(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        })
+        this.dispatchEvent(evt)
     }
 }
